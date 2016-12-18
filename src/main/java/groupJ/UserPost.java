@@ -1,6 +1,6 @@
 package groupJ;
 
-public class User {
+public class UserPost {
     private int userId;
     private int id;
     private String title;
@@ -11,7 +11,7 @@ public class User {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        User user = (User) o;
+        UserPost user = (UserPost) o;
 
         if (userId != user.userId) return false;
         if (id != user.id) return false;
@@ -24,11 +24,11 @@ public class User {
         return 0;
     }
 
-    public User(){
+    public UserPost(){
         super();
     }
 
-    public User(int id, String title, String body, int userId) {
+    public UserPost(int id, String title, String body, int userId) {
         this.userId = userId;
         this.id = id;
         this.title = title;
