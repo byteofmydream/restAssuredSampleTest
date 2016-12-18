@@ -2,6 +2,7 @@ package groupJ;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -9,6 +10,7 @@ import org.junit.Test;
 import org.json.*;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import static io.restassured.RestAssured.given;
 import static org.junit.Assert.assertEquals;
@@ -41,19 +43,37 @@ public class TestClass {
     }
 
     @Test
-    public void postUserPostTest(){
+    public void postUserPostTest() throws IOException {
         String title = "foo";
         String body = "bar";
-        UserPost post = new UserPost(1, title, body, 1);
+        UserPost post = new UserPost(100600, title, body, 1);
+
+        OutputStream os = new OutputStream() {
+            StringBuilder sb = new StringBuilder();
+
+            @Override
+            public String toString() {
+                return sb.toString();
+            }
+
+            public void write(int b) throws IOException {
+                sb.append((char) b);
+            }
+        };
+
+        ObjectMapper om = new ObjectMapper();
+        om.writeValue(os, post);
 
         Response response = given().
+                contentType(ContentType.JSON).
+                body(os.toString()).
                 when().
-                get("/posts");
+                post("/posts");
 
-        assertEquals(200, response.getStatusCode());
-        JSONArray respJsonArray = new JSONArray(response.body().asString());
-        JSONObject respJsonObject = respJsonArray.getJSONObject(0);
-        UserPost actualPost = new ObjectMapper().readValue(respJsonObject.toString(), UserPost.class);
+        assertEquals(201, response.getStatusCode());
+        JSONObject respJsonObject = new JSONObject(response.body().asString());
+        UserPost receivedPost = new ObjectMapper().readValue(respJsonObject.toString(), UserPost.class);
+        assertEquals(post, receivedPost);
     }
 
 }
